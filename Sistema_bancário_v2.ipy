@@ -74,6 +74,9 @@ def cria_usuario(usuario):
   return usuario 
 def cria_conta (usuario,conta,num_conta,agencia):
   cpf = str(input("Digite seu cpf: "))
+  if len(cpf) != 11:
+    print("cpf inválido, tente novamente")
+    return
   for chave in usuario.keys():
     if cpf == usuario[chave]['cpf']:
       conta.update({cpf:{'agência': agencia,'conta': num_conta, 'usuário': chave}})
