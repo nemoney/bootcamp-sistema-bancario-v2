@@ -1,0 +1,129 @@
+def saque(*,saldo, valor_saque, limite_saques, limite_valor, extrato, qntd):
+  if qntd<limite_saques and valor_saque<=limite_valor and saldo >= valor_saque and valor_saque > 0:
+     saldo -= valor_saque
+     qntd += 1
+     extrato += f'Saque: -R${valor_saque:.2f}\n'
+     print(f"Saque realizado com sucesso")
+  elif saldo <= valor_saque:
+     print("Não é possível realizar a operação, saldo insuficiente")
+  elif valor_saque > limite_valor:
+     print(f"Não é possível realizar a operação, valor excede o limite de R${limite_valor:.2f}") 
+  elif qntd >= limite_saques:
+     print(f"Não é possível realizar a operação, valor excede o limite diário de {limite_saques} saques")    
+  else:
+     print("Não foi possível realizar a operação, tente novamente") 
+  return saldo, extrato, qntd        
+
+def deposito(saldo, extrato, valor_deposito, /):
+    if valor_deposito > 0:
+        saldo += valor_deposito
+        extrato += f'Depósito: R${valor_deposito:.2f}\n'
+        print("Depósito realizado com sucesso")
+    else: 
+        print("Não é possível realizar a operação, tente novamente")
+    return saldo, extrato
+
+def exibe_extrato(saldo, saldo_inicial,/,*,extrato):
+  if extrato == "":
+    print(f'''
+--------EXTRATO-----------
+Não foram realizadas movimentações
+
+--------------------------
+saldo final: R$ {saldo:.2f}
+''')         
+  else:
+    print(f'''
+--------EXTRATO-----------
+{extrato} 
+--------------------------
+saldo inicial: R$ {saldo_inicial:.2f}
+saldo final: R$ {saldo:.2f}
+''')
+
+def cria_usuario(usuario):
+  nome = str(input("Digite seu nome: "))
+  cpf =  str(input("Digite seu cpf: "))
+  if len(cpf) != 11:
+    print("cpf inválido, tente novamente")
+    return
+  for chave in usuario.keys():
+    if cpf == usuario[chave]['cpf']:
+       print("cpf já existente")
+       return
+  dia = str(input("Digite o dia em que você nasceu com 2 dígitos: "))  
+  if len(dia) != 2:
+    print("sintaxe inválida, utilize 2 dígitos")
+    return
+  mês = str(input("Digite o mês em que você nasceu com 2 dígitos: "))
+  if len(mês) != 2:
+    print("sintaxe inválida, utilize 2 dígitos")
+    return
+  ano = str(input("Digite o ano em que você nasceu com 4 dígitos: "))
+  if len(ano) != 4:
+    print("sintaxe inválida, utilize 4 dígitos")
+    return
+  rua = str(input("Digite o nome da sua rua: "))
+  num = str(input("Digite o número da sua casa: ")) 
+  cid = str(input("Digite sua cidade: "))
+  uf =  str(input("Digite sua Unidade Federativa: ")) 
+  data = dia + "/" + mês + "/" + ano
+  endereço = rua + "-"+ num+"-"+"cidade"+"/"+uf
+  usuario.update({nome: {"cpf": cpf, "data de nascimento": data, "endereço": endereço}})
+  print("usuário criado com sucesso")
+  return usuario 
+def cria_conta (usuario,conta,num_conta,agencia):
+  cpf = str(input("Digite seu cpf: "))
+  for chave in usuario.keys():
+    if cpf == usuario[chave]['cpf']:
+      conta.update({cpf:{'agência': agencia,'conta': num_conta, 'usuário': chave}})
+      num_conta+=1
+      print("conta criada com sucesso")
+      print(conta)
+      return conta,num_conta
+  else:
+    print("Não foi possível encontrar o usuário")
+  return conta,num_conta
+
+menu = '''
+Digite uma das operações abaixo:
+[d] Depósito
+[s] Saque
+[e] Extrato
+[u] Criar usuário
+[c] Criar conta
+[q] Sair
+'''
+limite_diario = 3
+limite_valor = 500
+saldo = saldo_inicial = 2000
+numero_saques = 0
+extrato = ""
+usuario = {}
+num_conta = 1
+agencia = '0001'
+conta = {}
+while True:
+    opcao  = input(menu)
+    if opcao == "d":
+        valor_deposito = float(input("Digite qual valor deseja depositar: "))
+        saldo, extrato = deposito(saldo, extrato, valor_deposito)
+    elif opcao == "s":
+        valor_saque = int(input("Digite o valor para sacar: "))
+        saldo, extrato, numero_saques = saque(saldo=saldo,
+                                        valor_saque=valor_saque,
+                                        extrato=extrato,
+                                        limite_saques=limite_diario,
+                                        limite_valor=limite_valor,
+                                        qntd=numero_saques)
+    elif opcao == "e":
+       exibe_extrato(saldo, saldo_inicial, extrato=extrato)
+    elif opcao == 'u':
+       usuario = cria_usuario(usuario)
+    elif opcao == 'c':
+      conta, num_conta = cria_conta(usuario,conta,num_conta,agencia)
+    elif opcao == "q":
+        break
+    else:
+        print("Operação inválida, tente novamente")       
+                
